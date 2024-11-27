@@ -100,3 +100,16 @@ sol = GES(...
           Display=display...
         );
 ```
+
+Fast visualization of the solution can be done with class method:
+
+```
+sol.visTriang;
+```
+
+Maximum number of triangulation points can be altered after the initialization:
+
+```
+sol.PointNumMax = ...;
+sol.fitTriang;
+```
