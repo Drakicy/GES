@@ -551,7 +551,7 @@ classdef GES < handle
 end
 
 function mustBeDimSorted(x, dim)
-    if any(~issorted(x,dim))
+    if ~issorted(x,dim)
         eid = 'Data:notSorted';
         msg = 'Rows of the argument must be sorted.';
         error(eid, msg);
