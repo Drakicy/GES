@@ -390,13 +390,13 @@ classdef GES < handle
             end
         end
 
-        function visTriang(obj, options)
+        function visTriang(obj, RegionType)
             %% visTriang: triangulation visualization
             %   RegionType (optional) - region type, a member of [0 -1 1]
 
             arguments
                 obj
-                options.RegionType (1,:) {mustBeMember(options.RegionType, [0 -1 1])} = [0 -1 1]
+                RegionType (1,:) {mustBeMember(RegionType, [0 -1 1])} = [0 -1 1]
             end
 
             %% Setting figure parameters
@@ -417,7 +417,7 @@ classdef GES < handle
             TR = triangulation(obj.DT(:,:), obj.Domain(1,:) + obj.DomainNorm .* obj.DT.Points);
             triplot(TR, '-k');
 
-            for type = options.RegionType
+            for type = RegionType
                 if type == 0
                     ind = (obj.CandPoint(:,end) == 0);
                 else
