@@ -111,8 +111,8 @@ classdef GES < handle
             obj.DomainNorm = min(side);
             side_rel = side / obj.DomainNorm;
 
-            n_x = round(side_rel(1)) + 1;
-            n_y = round(side_rel(2)) + 1;
+            n_x = ceil(side_rel(1)) + 1;
+            n_y = ceil(side_rel(2)) + 1;
             [initial_point_x, initial_point_y] = ndgrid(...
                         linspace(0, side_rel(1), n_x),...
                         linspace(0, side_rel(2), n_y)...
