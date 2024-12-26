@@ -76,21 +76,22 @@ classdef GES < handle
     methods
         function obj = GES(Func, Domain, Tol, PointNumMax, options)
             %% Global Equation Solver (GES)
-            %   Func - the analyzed function, function handle f(z)
-            %   Domain(i,j) - the analyzed domain boundaries, a matrix 2x2
-            %   Tol - approximation relative tolerance level, a
+            %   Func - analyzed function,
+            %          function handle f(z)
+            %   Domain(i,j) - analyzed domain boundaries,
+            %                 matrix 2x2
+            %   Tol - approximation relative tolerance level,
             %         positive scalar with value less than 1       
-            %   PointNumMax - triangulation points number maximum, an 
+            %   PointNumMax - triangulation points number maximum, 
             %                 integer greater than 2
-            %   PointNumMin (optional) - triangulation points number
-            %                            minimum, a positive integer
-            %                            (default 25)
-            %   PropMax (optional) - absolute value flow maximum, a 
+            %   PointNumMin (optional) - triangulation points number minimum,
+            %                            positive integer (default 25)
+            %   PropMax (optional) - absolute value flow maximum, 
             %                        positive scalar (default 1)
-            %   BatchSize (optional) - batch size, a nonnegative integer
-            %                          (default 0, no batching)
-            %   Display (optional) - output flag, either "off" or "on" 
-            %                        (default "off")
+            %   BatchSize (optional) - batch size,
+            %                          nonnegative integer (default 0, no batching)
+            %   Display (optional) - output flag,
+            %                        either "off" or "on" (default "off")
         
             arguments
                 Func function_handle
@@ -117,19 +118,10 @@ classdef GES < handle
                         linspace(0, side_rel(1), n_x),...
                         linspace(0, side_rel(2), n_y)...
                     );
-            initial_point =...
+            obj.PointStorage =...
                 [
                     initial_point_x(:) initial_point_y(:)
                 ];
-            initial_point_x = initial_point_x(1:end-1,1:end-1);
-            initial_point_y = initial_point_y(1:end-1,1:end-1);
-            initial_point =...
-                [
-                    initial_point
-                    [initial_point_x(:) initial_point_y(:)] + side_rel ./ [n_x - 1 n_y - 1] / 2
-                ];
-
-            obj.PointStorage = initial_point;
 
             obj.Tol = Tol;
 
@@ -142,13 +134,13 @@ classdef GES < handle
             obj.BatchSize = options.BatchSize;
             obj.Display = options.Display;
 
-            obj.StartTime = tic;
-
             obj.fitTriang;
         end
 
         function fitTriang(obj)
             %% fitTriang: triangulation fitting
+
+            obj.StartTime = tic;
 
             %% Completing previous run
 
@@ -306,9 +298,13 @@ classdef GES < handle
             %% Displaying algorithm progress
 
             if obj.Display == "on"
-                char_num = fprintf('<strong>Triangulation is completed.</strong>\n');
-                fprintf('Elapsed time: <strong>%0.2f</strong> s\n', toc(obj.StartTime));
-                fprintf([repmat('-',1,char_num) '\n']);
+                fprintf( ...
+                    [
+                        '<strong>Refinement is completed.</strong>\n' ...
+                        'Refinement time: <strong>%.2f</strong>\n\n'
+                    ], toc(obj.StartTime));
+
+                obj.StartTime = tic;
             end
 
             %% Identifying candidate pairs
@@ -387,6 +383,16 @@ classdef GES < handle
                 end      
 
                 obj.CandPoint(:,2) = round(obj.CandPoint(:,2), ceil(-log10(sqrt(eps))));
+
+                if obj.Display == "on"
+                    fprintf( ...
+                        [
+                            '<strong>Classification is completed.</strong>\n' ...
+                            'Classification time: <strong>%0.2f</strong> s\n\n'
+                        ], toc(obj.StartTime));
+
+                    disp(array2table(obj.CandPoint, VariableNames=["z" "k"]));
+                end
             end
         end
 
@@ -408,8 +414,6 @@ classdef GES < handle
                     0 0.4470 0.7410
                     ];
     
-            figure(Units='normalized', Position=[0.2 0.2 0.6 0.6]);
-
             %% Plotting triangulation
 
             hold on
@@ -455,10 +459,10 @@ classdef GES < handle
 
             axis(obj.Domain(:));
     
-            set(gca, 'FontSize', 16);
+            set(gca, 'FontSize', 18);
     
-            xlabel('$x$', Interpreter='latex', FontSize=18);
-            ylabel('$y$', Interpreter='latex', FontSize=18);
+            xlabel('$x$', Interpreter='latex', FontSize=25);
+            ylabel('$y$', Interpreter='latex', FontSize=25);
         end
     end
 
@@ -502,9 +506,11 @@ classdef GES < handle
             %% Displaying algorithm progress
     
             if obj.Display == "on"
-                char_num = fprintf('Number of triangulation points: <strong>%i</strong>\n', obj.PointNum);
-                fprintf('Elapsed time: <strong>%0.2f</strong> s\n', toc(obj.StartTime));
-                fprintf([repmat('-',1,char_num) '\n']);
+                fprintf( ...
+                    [
+                        'Points number: <strong>%i</strong>\n' ...
+                        'Refinement time: <strong>%.2f</strong>\n\n'
+                    ], obj.PointNum, toc(obj.StartTime));
             end
         end
 
@@ -542,6 +548,7 @@ classdef GES < handle
                 value = M;
             else
                 value = 0;
+                
                 for i = 1:size(M,2)
                     value = value + (-1)^(i+1) * M(:,i,1) .* obj.detND(M(:,1:size(M,2) ~= i,2:end));
                 end
