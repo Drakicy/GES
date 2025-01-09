@@ -399,7 +399,8 @@ classdef GES < handle
 
         function visTriang(obj, RegionType)
             %% visTriang: triangulation visualization
-            %   RegionType (optional) - region type, a member of [0 -1 1]
+            %   RegionType (optional) - region type,
+            %                           member of [0 -1 1]
 
             arguments
                 obj
