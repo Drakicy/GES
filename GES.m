@@ -8,21 +8,9 @@ classdef GES < handle
         DomainNorm (1,1)
         %   scalar
 
-        %% Tol: approximation relative tolerance level
-        Tol (1,1)
-        %   scalar
-
         %% Func: analyzed function
         Func function_handle
         %   function handle
-
-        %% PointNumMin: triangulation points number minimum
-        PointNumMin (1,1)
-        %   scalar
-
-        %% PropMax: absolute value flow maximum
-        PropMax (1,1)
-        %   scalar
 
         %% DT: Delaunay triangulation
         DT = delaunayTriangulation()
@@ -46,8 +34,20 @@ classdef GES < handle
     end
 
     properties
+        %% Tol: approximation relative tolerance level
+        Tol (1,1) {mustBePositive, mustBeLessThanOrEqual(Tol, 1)} = 1
+        %   scalar
+
         %% PointNumMax: triangulation points number maximum
-        PointNumMax (1,1) {mustBeInteger, mustBeGreaterThan(PointNumMax, 2)} = 3
+        PointNumMax (1,1) {mustBeInteger, mustBeNonnegative} = 0
+        %   scalar
+
+        %% PointNumMin: triangulation points number minimum
+        PointNumMin (1,1) {mustBeInteger, mustBePositive} = 25
+        %   scalar
+
+        %% PropMax: absolute value flow maximum
+        PropMax (1,1) {mustBePositive} = 1
         %   scalar
 
         %% BatchSize: batch size
@@ -74,7 +74,7 @@ classdef GES < handle
     end
 
     methods
-        function obj = GES(Func, Domain, Tol, PointNumMax, options)
+        function obj = GES(Func, Domain, Tol, options)
             %% Global Equation Solver (GES)
             %   Func - analyzed function,
             %          function handle f(z)
@@ -82,8 +82,8 @@ classdef GES < handle
             %                 matrix 2x2
             %   Tol - approximation relative tolerance level,
             %         positive scalar with value less than 1       
-            %   PointNumMax - triangulation points number maximum, 
-            %                 integer greater than 2
+            %   PointNumMax (optional) - triangulation points number maximum, 
+            %                            positive integer (default 0, no limit)
             %   PointNumMin (optional) - triangulation points number minimum,
             %                            positive integer (default 25)
             %   PropMax (optional) - absolute value flow maximum, 
@@ -97,7 +97,7 @@ classdef GES < handle
                 Func function_handle
                 Domain (2,2) {mustBeReal, mustBeDimSorted(Domain, 1), mustBeNonzeroDifference}
                 Tol (1,1) {mustBePositive, mustBeLessThan(Tol, 1)}
-                PointNumMax (1,1) {mustBeInteger, mustBeGreaterThan(PointNumMax, 2)}
+                options.PointNumMax (1,1) {mustBeInteger, mustBeNonnegative} = 0
                 options.PointNumMin (1,1) {mustBeInteger, mustBePositive} = 25
                 options.PropMax (1,1) {mustBePositive} = 1
                 options.BatchSize (1,1) {mustBeInteger, mustBeNonnegative} = 0
@@ -127,7 +127,7 @@ classdef GES < handle
 
             obj.Func = @(z) Func((obj.Domain(1,:) + obj.DomainNorm .* z) * [1; 1i]);
 
-            obj.PointNumMax = PointNumMax;
+            obj.PointNumMax = options.PointNumMax;
             obj.PointNumMin = options.PointNumMin;
             obj.PropMax = options.PropMax;
 
@@ -150,7 +150,7 @@ classdef GES < handle
 
             %% Performing current run
 
-            while obj.PointNum < obj.PointNumMax
+            while (obj.PointNum < obj.PointNumMax) || (obj.PointNumMax == 0)
                 %% Identifying candidate simplexes
 
                 pair = edges(obj.DT);
@@ -379,7 +379,8 @@ classdef GES < handle
 
                 for i = 1:length(obj.CandRegion)
                     obj.CandPoint(i,1) = (obj.Domain(1,:) + obj.DomainNorm .* mean(obj.DT.Points(obj.CandRegion{i},:),1)) * [1; 1i];
-                    obj.CandPoint(i,2) = sum(obj.argDiff(obj.CandRegion{i}, circshift(obj.CandRegion{i},-1))) / (2 * pi);
+                    arg_diff = obj.argDiff(obj.CandRegion{i}, circshift(obj.CandRegion{i},-1));
+                    obj.CandPoint(i,2) = sum(arg_diff .* (arg_diff < 2 * pi / 3)) / (2 * pi);
                 end      
 
                 obj.CandPoint(:,2) = round(obj.CandPoint(:,2), ceil(-log10(sqrt(eps))));
@@ -402,7 +403,7 @@ classdef GES < handle
 
             arguments
                 obj
-                RegionType (1,:) {mustBeMember(RegionType, [0 -1 1])} = [0 -1 1]
+                RegionType (1,:) {mustBeMember(RegionType, [0 -1 1])} = [-1 1]
             end
 
             %% Setting figure parameters
@@ -471,9 +472,13 @@ classdef GES < handle
             %% updateDT: Delaunay triangulation update
             %   NewPoint(i,j) - new triangulation points, matrix
 
-            point_max = min(size(RefPoint,1), obj.PointNumMax - obj.PointNum);
-            obj.PointStorage = RefPoint(point_max+1:size(RefPoint,1),:);
-            ref_point = RefPoint(1:point_max,:);
+            if obj.PointNumMax == 0
+                ref_point = RefPoint;
+            else
+                point_max = min(size(RefPoint,1), obj.PointNumMax - obj.PointNum);
+                obj.PointStorage = RefPoint(point_max+1:size(RefPoint,1),:);
+                ref_point = RefPoint(1:point_max,:);
+            end
 
             obj.DT.Points =...
                 [

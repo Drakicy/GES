@@ -22,7 +22,7 @@ tol = 1e-3;
 
 %%
 
-point_num_max = [5e1 1e2 2e2 ceil(1 / tol^2)];
+point_num_max = [5e1 1e2 2e2 0];
 
 %%
 
@@ -41,7 +41,7 @@ for i = 1:4
         sol.PointNumMax = point_num_max(i);
         sol.fitTriang;
     else
-        sol = GES(@(z) f(z,a), [x; y]', tol, point_num_max(i));
+        sol = GES(@(z) f(z,a), [x; y]', tol, PointNumMax=point_num_max(i));
     end
 
     time_elapsed = time_elapsed + toc;
@@ -69,7 +69,7 @@ end
 %%
 
 a = (sqrt(3) + 1i * sqrt(2)) / 4 * [1e-1 1e-2];
-point_num_max = ceil(1 / tol^2);
+point_num_max = 0;
 
 %%
 
@@ -82,13 +82,13 @@ for i = 1:2
 
     %%
 
-    sol = GES(@(z) f(z,a(i)), [x; y]', tol, point_num_max);
+    sol = GES(@(z) f(z,a(i)), [x; y]', tol, PointNumMax=point_num_max);
 
     fprintf(...
         [
             'Points number: <strong>%i</strong>\n'...
             'Overall time: <strong>%f sec</strong>\n'
-        ], sol.PointNum, time_elapsed);
+        ], sol.PointNum, toc);
 
     %%
 

@@ -35,7 +35,7 @@ for i = 1:n
         sol.PointNumMax = point_num_max(i);
         sol.fitTriang;
     else
-        sol = GES(@(z) f(z,a), [x; y]', tol, point_num_max(i));
+        sol = GES(@(z) f(z,a), [x; y]', tol, PointNumMax=point_num_max(i));
     end
 
     approx_error(i) = abs(mean(sol.CandPoint(:,1)) - a);

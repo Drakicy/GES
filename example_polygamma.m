@@ -19,7 +19,7 @@ x = [-3.75 3.75];
 y = [-1 1];
 
 tol = 1e-3;
-point_num_max = ceil(1 / tol^2);
+point_num_max = 0;
 
 %%
 
@@ -32,7 +32,7 @@ for i = 1:2
 
     %%
 
-    sol = GES(@(z) fn(z, i - 1), [x; y]', tol, point_num_max);
+    sol = GES(@(z) fn(z, i - 1), [x; y]', tol, PointNumMax=point_num_max);
 
     %%
 

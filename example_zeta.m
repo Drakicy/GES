@@ -22,7 +22,7 @@ tol = 1e-3;
 
 %%
 
-point_num_max = [1e2 2e2 4e2 floor(1 / tol^2)];
+point_num_max = [1e2 2e2 4e2 0];
 
 %%
 
@@ -41,7 +41,7 @@ for i = 1:4
         sol.PointNumMax = point_num_max(i);
         sol.fitTriang;
     else
-        sol = GES(f, [x; y]', tol, point_num_max(i));
+        sol = GES(f, [x; y]', tol, PointNumMax=point_num_max(i));
     end
 
     %%
