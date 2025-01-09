@@ -98,7 +98,7 @@ sol.Display = ...;
 sol.fitTriang;
 ```
 
-Fast visualization of the solution can be done with a class method:
+Fast visualization of the solution can be done through the class method:
 ```
 sol.visTriang;
 ```
