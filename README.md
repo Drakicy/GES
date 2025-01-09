@@ -15,15 +15,13 @@ Refer to these publications if the algorithm is used in a scientific work.
 The solver is represented as a class in MATLAB (see examples).
 
 $f$ can be set as an anonymous function:
-
 ```
 f = @(z) ...;
 ```
 
 The inspected domain has to be represented as a matrix:
-
 ```
-domain =...
+domain = ...
     [
         x_min y_min
         x_max y_max
@@ -31,30 +29,20 @@ domain =...
 ```
 
 The approximation error is controlled through a relative tolerance level:
-
 ```
-tol = ...
-```
-
-Total time consumption can be limited by maximum number of triangulation points:
-
-```
-point_num_max = ...;
+tol = ... %positive scalar with value less than 1  
 ```
 
 The class can be initialized as follows:
-
 ```
-sol = GES(...
-          f,...
-          domain,...
-          tol,...
-          point_num_max...
+sol = GES( ...
+          f, ...
+          domain, ...
+          tol ...
         );
 ```
 
 Output contains following general properties:
-
 ```
 sol.Domain %analyzed domain
 sol.DomainNorm %domain normalization
@@ -67,33 +55,30 @@ sol.CandPoint %candidate points
 sol.CandRegion %candidate regions
 ```
 
-The algorithm is affected by 2 optional parameters: minimum number of triangulation points for halting (before reaching maximum, default 25) and maximum value of the absolute value flow to consider (default 1).
-
+The algorithm is affected by 3 optional parameters: maximum number of triangulation points (limits time consumption), minimum number of triangulation points (prevents early halting) and maximum value of the absolute value flow to consider (limits time consumption/prevents early halting).
 ```
-point_num_min = ...;
-prop_max = ...;
+point_num_max = ...; %positive integer (default 0, no limit)
+point_num_min = ...; %positive integer (default 25)
+prop_max = ...; %positive scalar (default 1)
 ```
 
 Additionally, batching can be performed to limit memory consumption:
-
 ```
-batch_size = ...;
+batch_size = ...; %nonnegative integer (default 0, no batching)
 ```
 
 Displaying of the progress can be turned on optionally:
-
 ```
-display = ...;
+display = ...; %either "off" or "on" (default "off")
 ```
 
 Complete algorithm initialization can be represented as:
-
 ```
 sol = GES(...
           f,...
           domain,...
           tol,...
-          point_num_max,...
+          PointNumMax=point_num_max,...
           PointNumMin=point_num_min,...
           PropMax=prop_max,...
           BatchSize=batch_size,...
@@ -101,15 +86,27 @@ sol = GES(...
         );
 ```
 
-Fast visualization of the solution can be done with class method:
+Some class properties can be altered after the initialization:
+```
+sol.Tol = ...;
+sol.PointNumMax = ...;
+sol.PointNumMin = ...;
+sol.PropMax = ...;
+sol.BatchSize = ...;
+sol.Display = ...;
 
+sol.fitTriang;
+```
+
+Fast visualization of the solution can be done with a class method:
 ```
 sol.visTriang;
 ```
 
-Maximum number of triangulation points can be altered after the initialization:
+The type of region to visualize can be set through an optional argument:
+```
+region_type = ... %member of [0 -1 1] (unknown, poles and zeros, respectively, default [-1 1])
+sol.visTriang(region_type);
+```
 
-```
-sol.PointNumMax = ...;
-sol.fitTriang;
-```
+
