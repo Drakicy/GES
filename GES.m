@@ -47,7 +47,7 @@ classdef GES < handle
         %   scalar
 
         %% PropMax: absolute value flow maximum
-        PropMax (1,1) {mustBePositive} = 1
+        PropMax (1,1) {mustBePositive} = Inf
         %   scalar
 
         %% BatchSize: batch size
@@ -87,7 +87,7 @@ classdef GES < handle
             %   PointNumMin (optional) - triangulation points number minimum,
             %                            positive integer (default 25)
             %   PropMax (optional) - absolute value flow maximum, 
-            %                        positive scalar (default 1)
+            %                        positive scalar (default Inf)
             %   BatchSize (optional) - batch size,
             %                          nonnegative integer (default 0, no batching)
             %   Display (optional) - output flag,
@@ -99,7 +99,7 @@ classdef GES < handle
                 Tol (1,1) {mustBePositive, mustBeLessThan(Tol, 1)}
                 options.PointNumMax (1,1) {mustBeInteger, mustBeNonnegative} = 0
                 options.PointNumMin (1,1) {mustBeInteger, mustBePositive} = 25
-                options.PropMax (1,1) {mustBePositive} = 1
+                options.PropMax (1,1) {mustBePositive} = Inf
                 options.BatchSize (1,1) {mustBeInteger, mustBeNonnegative} = 0
                 options.Display {mustBeMember(options.Display, ["off" "on"])} = 'off'
             end

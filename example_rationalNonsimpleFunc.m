@@ -23,7 +23,7 @@ tol = 1e-3;
 
 %%
 
-point_num_max = [5e1 1e2 2e2 0];
+point_num_max = [1e1 5e1 1e2 0];
 
 %%
 
@@ -59,7 +59,7 @@ for i = 1:4
 
     ax = subplot(2,2,i);
 
-    sol.visTriang;
+    sol.visTriang([0 -1 1]);
     
     title(ax, set_title(i), FontSize=22);
 end

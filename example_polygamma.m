@@ -32,7 +32,7 @@ for i = 1:2
 
     %%
 
-    sol = GES(@(z) fn(z, i - 1), [x; y]', tol, PointNumMax=point_num_max);
+    sol = GES(@(z) fn(z, i - 1), [x; y]', tol, PointNumMax=point_num_max, PropMax=1);
 
     %%
 
@@ -46,7 +46,7 @@ for i = 1:2
 
     ax = subplot(1,2,i);
 
-    sol.visTriang;
+    sol.visTriang([0 -1 1]);
     
     title(ax, set_title(i), FontSize=22);
 end
