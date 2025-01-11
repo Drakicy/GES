@@ -55,11 +55,11 @@ sol.CandPoint %candidate points
 sol.CandRegion %candidate regions
 ```
 
-The algorithm is affected by 3 optional parameters: maximum number of triangulation points (limits time consumption), minimum number of triangulation points (prevents early halting) and maximum value of the absolute value flow to consider (limits time consumption/prevents early halting).
+The algorithm is affected by 3 optional parameters: maximum number of triangulation points (limits time consumption), minimum number of triangulation points (prevents early halting) and maximum value of the absolute value flow to consider (prevents early halting).
 ```
 point_num_max = ...; %positive integer (default 0, no limit)
 point_num_min = ...; %positive integer (default 25)
-prop_max = ...; %positive scalar (default 1)
+prop_max = ...; %positive scalar (default Inf)
 ```
 
 Additionally, batching can be performed to limit memory consumption:
