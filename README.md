@@ -95,7 +95,7 @@ sol.PropMax = ...;
 sol.BatchSize = ...;
 sol.Display = ...;
 
-sol.fitTriang;
+sol.fitTriang; %refit the triangulation
 ```
 
 Fast visualization of the solution can be done through the class method:
