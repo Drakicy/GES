@@ -88,6 +88,8 @@ classdef GES < handle
             %                            positive integer (default 25)
             %   PropMax (optional) - absolute value flow maximum, 
             %                        positive scalar (default Inf)
+            %   AddPoint(i) (optional) - additional triangulation points,
+            %                            vector (default empty)
             %   BatchSize (optional) - batch size,
             %                          nonnegative integer (default 0, no batching)
             %   Display (optional) - output flag,
@@ -95,11 +97,12 @@ classdef GES < handle
         
             arguments
                 Func function_handle
-                Domain (2,2) {mustBeReal, mustBeDimSorted(Domain, 1), mustBeNonzeroDifference}
-                options.Tol (1,1) {mustBePositive, mustBeLessThan(options.Tol, 1)} = 1 / 2^10
+                Domain (2,2) {mustBeReal, mustBeDimSorted(Domain,1), mustBeDimUnique(Domain,2)}
+                options.Tol (1,1) {mustBePositive, mustBeLessThan(options.Tol,1)} = 1 / 2^10
                 options.PointNumMax (1,1) {mustBeInteger, mustBeNonnegative} = 0
                 options.PointNumMin (1,1) {mustBeInteger, mustBePositive} = 25
                 options.PropMax (1,1) {mustBePositive} = Inf
+                options.AddPoint (:,1) {mustBeInsideDomain(options.AddPoint,Domain)} = []
                 options.BatchSize (1,1) {mustBeInteger, mustBeNonnegative} = 0
                 options.Display {mustBeMember(options.Display, ["off" "on"])} = 'off'
             end
@@ -114,14 +117,16 @@ classdef GES < handle
 
             n_x = ceil(side_rel(1)) + 1;
             n_y = ceil(side_rel(2)) + 1;
-            [initial_point_x, initial_point_y] = ndgrid(...
-                        linspace(0, side_rel(1), n_x),...
-                        linspace(0, side_rel(2), n_y)...
+            [initial_point_x, initial_point_y] = ndgrid( ...
+                        linspace(0, side_rel(1), n_x), ...
+                        linspace(0, side_rel(2), n_y) ...
                     );
-            obj.PointStorage =...
-                [
-                    initial_point_x(:) initial_point_y(:)
-                ];
+            obj.PointStorage = unique( ...
+                    [
+                        initial_point_x(:) initial_point_y(:)
+                        ([real(options.AddPoint) imag(options.AddPoint)] - obj.Domain(1,:)) / obj.DomainNorm
+                    ], ...
+                'rows');
 
             obj.Tol = options.Tol;
 
@@ -589,16 +594,31 @@ end
 
 function mustBeDimSorted(x, dim)
     if ~issorted(x,dim)
-        eid = 'Data:notSorted';
-        msg = sprintf('Argument must be sorted along %i dimension.', dim);
-        error(eid, msg);
+        error( ...
+                'Data:notSorted', ...
+                'Argument must be sorted along %i dimension.', dim ...
+            );
     end
 end
 
-function mustBeNonzeroDifference(x)
-    if any(diff(x,1,1) == 0)
-        eid = 'Data:zeroDifference';
-        msg = 'Argument must have different values in columns.';
-        error(eid, msg);
+function mustBeDimUnique(x, dim)
+    x = permute(x,[dim setdiff(1:ndims(x),dim)]);
+
+    for i = 1:size(x,1)
+        if length(unique(x(i,:))) ~= length(x(i,:))
+            error( ...
+                    'Data:notUnique', ...
+                    'Argument must have unique values in slices along %i dimension.', dim ...
+                );
+        end
+    end
+end
+
+function mustBeInsideDomain(x, dom)
+    if any((real(x) < dom(1,1)) | (real(x) > dom(2,1))) || any((imag(x) < dom(1,2)) | (imag(x) > dom(2,2)))
+        error( ...
+                'Data:outOfDomain', ...
+                'Argument must correspond to points inside the domain.' ...
+            );
     end
 end
