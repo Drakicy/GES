@@ -1,10 +1,17 @@
 clear
-set(0, defaultAxesTickLabelInterpreter='latex');
-set(0, defaulttextinterpreter='latex');
-set(0, defaultLegendInterpreter='latex');
+set(0, ...
+        defaultTextInterpreter='latex', ...
+        defaultAxesTickLabelInterpreter='latex', ...
+        defaultAxesFontSize=18, ...
+        defaultAxesLabelFontSize=1.4, ...
+        defaultAxesTitleFontSize=1.4, ...
+        defaultLegendInterpreter='latex', ...
+        defaultLegendFontSize=16, ...
+        defaultLineLineWidth=1, ...
+        defaultLineMarkerSize=12 ...
+    );
 
-set_title = ["(a)" "(b)" "(c)" "(d)"];
-set_color = ...
+color = ...
     [
     0.8500 0.3250 0.0980;
     0 0 0;
@@ -18,15 +25,13 @@ f = @(z) (exp(4 * pi * (z + (sqrt(3) + 1i * sqrt(2)) / 4)) - 1) ./ (exp(4 * pi *
 x = [-1 1];
 y = x;
 
-tol = 1e-3;
-
 %%
 
 point_num_max = [1e1 5e1 1e2 0];
 
 %%
 
-figure(Position=[0 0 1000 1000]);
+fig = figure(Position=[0 0 1000 1000]);
 
 time_elapsed = 0;
 
@@ -41,7 +46,11 @@ for i = 1:4
         sol.PointNumMax = point_num_max(i);
         sol.fitTriang;
     else
-        sol = GES(f, [x; y]', tol, PointNumMax=point_num_max(i));
+        sol = GES( ...
+                f, ...
+                [x; y]', ...
+                PointNumMax=point_num_max(i) ...
+            );
     end
 
     %%
@@ -60,7 +69,7 @@ for i = 1:4
 
     sol.visTriang([0 -1 1]);
     
-    title(ax, set_title(i), FontSize=22);
+    title("(" + char('a' + (i - 1)) + ")");
 end
 
 %%
@@ -78,8 +87,6 @@ f = @(z) z + exp(4 * pi * z);
 
 x = [-1 1];
 y = x;
-
-tol = 1e-3;
 
 %%
 
@@ -102,7 +109,11 @@ for i = 1:4
         sol.PointNumMax = point_num_max(i);
         sol.fitTriang;
     else
-        sol = GES(f, [x; y]', tol, PointNumMax=point_num_max(i));
+        sol = GES( ...
+                f, ...
+                [x; y]', ...
+                PointNumMax=point_num_max(i) ...
+            );
     end
 
     %%
@@ -121,7 +132,7 @@ for i = 1:4
 
     sol.visTriang([0 -1 1]);
     
-    title(ax, set_title(i), FontSize=22);
+    title("(" + char('a' + (i - 1)) + ")");
 end
 
 %%

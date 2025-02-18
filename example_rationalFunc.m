@@ -1,9 +1,17 @@
 clear
-set(0, defaultAxesTickLabelInterpreter='latex');
-set(0, defaulttextinterpreter='latex');
-set(0, defaultLegendInterpreter='latex');
-set_title = ["(a)" "(b)" "(c)" "(d)"];
-set_color = ...
+set(0, ...
+        defaultTextInterpreter='latex', ...
+        defaultAxesTickLabelInterpreter='latex', ...
+        defaultAxesFontSize=18, ...
+        defaultAxesLabelFontSize=1.4, ...
+        defaultAxesTitleFontSize=1.4, ...
+        defaultLegendInterpreter='latex', ...
+        defaultLegendFontSize=16, ...
+        defaultLineLineWidth=1, ...
+        defaultLineMarkerSize=12 ...
+    );
+
+color = ...
     [
     0.8500 0.3250 0.0980;
     0 0 0;
@@ -18,7 +26,6 @@ x = [-1 1];
 y = x;
 
 a = (sqrt(3) + 1i * sqrt(2)) / 4;
-tol = 1e-3;
 
 %%
 
@@ -26,7 +33,7 @@ point_num_max = [1e1 2e1 5e1 0];
 
 %%
 
-figure(Position=[0 0 1000 1000]);
+fig = figure(Position=[0 0 1000 1000]);
 
 time_elapsed = 0;
 
@@ -41,7 +48,11 @@ for i = 1:4
         sol.PointNumMax = point_num_max(i);
         sol.fitTriang;
     else
-        sol = GES(@(z) f(z,a), [x; y]', tol, PointNumMax=point_num_max(i));
+        sol = GES( ...
+                @(z) f(z,a), ...
+                [x; y]', ...
+                PointNumMax=point_num_max(i) ...
+            );
     end
 
     time_elapsed = time_elapsed + toc;
@@ -58,7 +69,7 @@ for i = 1:4
 
     sol.visTriang([0 -1 1]);
     
-    title(ax, set_title(i), FontSize=22);
+    title("(" + char('a' + (i - 1)) + ")");
 end
 
 %%
@@ -82,7 +93,11 @@ for i = 1:2
 
     %%
 
-    sol = GES(@(z) f(z,a(i)), [x; y]', tol, PointNumMax=point_num_max);
+    sol = GES( ...
+            @(z) f(z,a(i)), ...
+            [x; y]', ...
+            PointNumMax=point_num_max ...
+        );
 
     fprintf(...
         [
@@ -96,7 +111,7 @@ for i = 1:2
 
     sol.visTriang([0 -1 1]);
     
-    title(ax, set_title(i), FontSize=22);
+    title("(" + char('a' + (i - 1)) + ")");
 end
 
 %%

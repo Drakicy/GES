@@ -16,7 +16,7 @@ classdef GES < handle
         DT = delaunayTriangulation()
         %   Delaunay triangulation class
 
-        %% FuncEval(i): function evaluations
+        %% FuncEval: function evaluations
         FuncEval (:,1)
         %   vector
 
@@ -60,11 +60,11 @@ classdef GES < handle
     end
 
     properties (Access=private, Hidden)
-        %% SimplexProp(i,j): simplex logarithmic properties
-        SimplexProp (:,:) = zeros(0,6)
+        %% SimplexProp: simplex logarithmic properties
+        SimplexProp (:,6) = zeros(0,6)
         %   matrix
 
-        %% PointStorage(i,j): leftover points storage
+        %% PointStorage: leftover points storage
         PointStorage (:,:)
         %   matrix
 
@@ -74,14 +74,14 @@ classdef GES < handle
     end
 
     methods
-        function obj = GES(Func, Domain, Tol, options)
+        function obj = GES(Func, Domain, options)
             %% Global Equation Solver (GES)
             %   Func - analyzed function,
             %          function handle f(z)
             %   Domain(i,j) - analyzed domain boundaries,
             %                 matrix 2x2
-            %   Tol - approximation relative tolerance level,
-            %         positive scalar with value less than 1       
+            %   Tol (optional) - approximation relative tolerance level,
+            %                    positive scalar with value less than 1 (default 1 / 2^10)    
             %   PointNumMax (optional) - triangulation points number maximum, 
             %                            positive integer (default 0, no limit)
             %   PointNumMin (optional) - triangulation points number minimum,
@@ -96,7 +96,7 @@ classdef GES < handle
             arguments
                 Func function_handle
                 Domain (2,2) {mustBeReal, mustBeDimSorted(Domain, 1), mustBeNonzeroDifference}
-                Tol (1,1) {mustBePositive, mustBeLessThan(Tol, 1)}
+                options.Tol (1,1) {mustBePositive, mustBeLessThan(options.Tol, 1)} = 1 / 2^10
                 options.PointNumMax (1,1) {mustBeInteger, mustBeNonnegative} = 0
                 options.PointNumMin (1,1) {mustBeInteger, mustBePositive} = 25
                 options.PropMax (1,1) {mustBePositive} = Inf
@@ -123,7 +123,7 @@ classdef GES < handle
                     initial_point_x(:) initial_point_y(:)
                 ];
 
-            obj.Tol = Tol;
+            obj.Tol = options.Tol;
 
             obj.Func = @(z) Func((obj.Domain(1,:) + obj.DomainNorm .* z) * [1; 1i]);
 
@@ -385,6 +385,8 @@ classdef GES < handle
 
                 obj.CandPoint(:,2) = round(obj.CandPoint(:,2), ceil(-log10(sqrt(eps))));
 
+                %% Displaying algorithm progress
+
                 if obj.Display == "on"
                     fprintf( ...
                         [
@@ -399,8 +401,8 @@ classdef GES < handle
 
         function visTriang(obj, RegionType)
             %% visTriang: triangulation visualization
-            %   RegionType (optional) - region type,
-            %                           member of [0 -1 1]
+            %   RegionType(i) (optional) - region type,
+            %                              subset of [0 -1 1]
 
             arguments
                 obj
@@ -409,7 +411,7 @@ classdef GES < handle
 
             %% Setting figure parameters
 
-            set_color =...
+            color =...
                     [
                     0.8500 0.3250 0.0980;
                     0 0 0;
@@ -421,7 +423,11 @@ classdef GES < handle
             hold on
 
             TR = triangulation(obj.DT(:,:), obj.Domain(1,:) + obj.DomainNorm .* obj.DT.Points);
-            triplot(TR, '-k');
+            triplot( ...
+                    TR, ...
+                    '-k', ...
+                    LineWidth=1 ...
+                );
 
             for type = RegionType
                 if type == 0
@@ -434,8 +440,9 @@ classdef GES < handle
                         real(obj.CandPoint(ind,1)),...
                         imag(obj.CandPoint(ind,1)),...
                         25,...
-                        set_color(type+2,:),...
-                        'filled' ...
+                        color(type+2,:),...
+                        'filled', ...
+                        SizeData=40 ...
                     )
 
                 cand_region = obj.CandRegion(ind);
@@ -451,7 +458,7 @@ classdef GES < handle
                     plot(...
                             cand_region_point(:,1),...
                             cand_region_point(:,2),...
-                            Color=set_color(type+2,:),...
+                            Color=color(type+2,:),...
                             LineWidth=2 ...
                         )
                 end
@@ -460,18 +467,29 @@ classdef GES < handle
             hold off
 
             axis(obj.Domain(:));
+
+            set(gca, ...
+                    FontSize=18 ...
+                );
     
-            set(gca, 'FontSize', 18);
-    
-            xlabel('$x$', Interpreter='latex', FontSize=25);
-            ylabel('$y$', Interpreter='latex', FontSize=25);
+            xlabel( ...
+                    '$x$', ...
+                    Interpreter='latex', ...
+                    FontSize=25 ...
+                );
+            ylabel( ...
+                    '$y$', ...
+                    Interpreter='latex', ...
+                    FontSize=25 ...
+                );
         end
     end
 
     methods (Access=private, Hidden)
         function updateDT(obj, RefPoint)
             %% updateDT: Delaunay triangulation update
-            %   NewPoint(i,j) - new triangulation points, matrix
+            %   RefPoint(i,j) - refinement points,
+            %                   matrix ?x2
 
             if obj.PointNumMax == 0
                 ref_point = RefPoint;
@@ -522,16 +540,20 @@ classdef GES < handle
 
         function value = absDiff(obj, FirstPoint, SecondPoint)
             %% absDiff: absolute value difference in a pair
-            %   FirstPoint(i) - first point, vector
-            %   SecondPoint(i) - second point, vector
+            %   FirstPoint(i) - first point,
+            %                   vector
+            %   SecondPoint(i) - second point,
+            %                    vector
 
             value = log(abs(obj.FuncEval(SecondPoint) ./ obj.FuncEval(FirstPoint)));
         end
 
         function value = argDiff(obj, FirstPoint, SecondPoint)
             %% argDiff: argument difference in a pair
-            %   FirstPoint(i) - first point, vector
-            %   SecondPoint(i) - second point, vector
+            %   FirstPoint(i) - first point,
+            %                   vector
+            %   SecondPoint(i) - second point,
+            %                    vector
 
             arg = obj.FuncEval(SecondPoint) ./ obj.FuncEval(FirstPoint);
             value = angle(arg);
@@ -540,8 +562,10 @@ classdef GES < handle
 
         function value = coordDiff(obj, FirstPoint, SecondPoint)
             %% coordDiff: coordinate difference in a pair
-            %   FirstPoint(i) - first point, vector
-            %   SecondPoint(i) - second point, vector
+            %   FirstPoint(i) - first point,
+            %                   vector
+            %   SecondPoint(i) - second point,
+            %                    vector
 
             value = vecnorm(obj.DT.Points(SecondPoint,:) - obj.DT.Points(FirstPoint,:),2,2);
         end
@@ -566,7 +590,7 @@ end
 function mustBeDimSorted(x, dim)
     if ~issorted(x,dim)
         eid = 'Data:notSorted';
-        msg = 'Rows of the argument must be sorted.';
+        msg = sprintf('Argument must be sorted along %i dimension.', dim);
         error(eid, msg);
     end
 end
