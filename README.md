@@ -28,11 +28,6 @@ domain = ...
     ];
 ```
 
-The approximation error is controlled through a relative tolerance level:
-```
-tol = ... %positive scalar with value less than 1  
-```
-
 The class can be initialized as follows:
 ```
 sol = GES( ...
@@ -55,8 +50,9 @@ sol.CandPoint %candidate points
 sol.CandRegion %candidate regions
 ```
 
-The algorithm is affected by 3 optional parameters: maximum number of triangulation points (limits time consumption), minimum number of triangulation points (prevents early halting) and maximum value of the absolute value flow to consider (prevents early halting).
+The algorithm is affected by 4 optional parameters: approximation relative tolerance level (limits time consumption), maximum number of triangulation points (limits time consumption), minimum number of triangulation points (prevents early halting) and maximum value of the absolute value flow to consider (prevents early halting).
 ```
+tol = ...; %positive scalar with value less than 1  (default 1 / 2^10)
 point_num_max = ...; %positive integer (default 0, no limit)
 point_num_min = ...; %positive integer (default 25)
 prop_max = ...; %positive scalar (default Inf)
@@ -77,7 +73,7 @@ Complete algorithm initialization can be represented as:
 sol = GES(...
           f,...
           domain,...
-          tol,...
+          Tol=tol,...
           PointNumMax=point_num_max,...
           PointNumMin=point_num_min,...
           PropMax=prop_max,...
@@ -105,7 +101,7 @@ sol.visTriang;
 
 The type of region to visualize can be set through an optional argument:
 ```
-region_type = ... %member of [0 -1 1] (unknown, poles and zeros, respectively, default [-1 1])
+region_type = ... %subset of [0 -1 1] (unknown, poles and zeros, respectively, default [-1 1])
 sol.visTriang(region_type);
 ```
 
