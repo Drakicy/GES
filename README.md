@@ -106,7 +106,7 @@ sol.visTriang;
 
 The type of region to visualize can be set through an optional argument:
 ```
-region_type = ... %subset of [0 -1 1] (unknown, poles and zeros, respectively, default [-1 1])
+region_type = ...; %subset of [0 -1 1] (unknown, poles and zeros, respectively, default [-1 1])
 sol.visTriang(region_type);
 ```
 
