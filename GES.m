@@ -85,7 +85,7 @@ classdef GES < handle
             %   PointNumMax (optional) - triangulation points number maximum, 
             %                            positive integer (default 0, no limit)
             %   PointNumMin (optional) - triangulation points number minimum,
-            %                            positive integer (default 25)
+            %                            positive integer (default empty, number of corner points plus 21)
             %   PropMax (optional) - absolute value flow maximum, 
             %                        positive scalar (default Inf)
             %   AddPoint(i) (optional) - additional triangulation points,
