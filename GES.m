@@ -43,7 +43,7 @@ classdef GES < handle
         %   scalar
 
         %% PointNumMin: triangulation points number minimum
-        PointNumMin (1,1) {mustBeInteger, mustBePositive} = 25
+        PointNumMin (1,1) {mustBeInteger, mustBeNonnegative} = 25
         %   scalar
 
         %% PropMax: absolute value flow maximum
@@ -100,7 +100,7 @@ classdef GES < handle
                 Domain (2,2) {mustBeReal, mustBeDimSorted(Domain,1), mustBeDimUnique(Domain,2)}
                 options.Tol (1,1) {mustBePositive, mustBeLessThan(options.Tol,1)} = 1 / 2^10
                 options.PointNumMax (1,1) {mustBeInteger, mustBeNonnegative} = 0
-                options.PointNumMin (1,1) {mustBeInteger, mustBePositive} = 25
+                options.PointNumMin {mustBeScalarOrEmpty, mustBeInteger, mustBeNonnegative} = []
                 options.PropMax (1,1) {mustBePositive} = Inf
                 options.AddPoint (:,1) {mustBeInsideDomain(options.AddPoint,Domain)} = []
                 options.BatchSize (1,1) {mustBeInteger, mustBeNonnegative} = 0
@@ -133,7 +133,13 @@ classdef GES < handle
             obj.Func = @(z) Func((obj.Domain(1,:) + obj.DomainNorm .* z) * [1; 1i]);
 
             obj.PointNumMax = options.PointNumMax;
-            obj.PointNumMin = options.PointNumMin;
+
+            if isempty(options.PointNumMin)
+                obj.PointNumMin = size(obj.PointStorage,1) + 21;
+            else
+                obj.PointNumMin = options.PointNumMin;
+            end
+
             obj.PropMax = options.PropMax;
 
             obj.BatchSize = options.BatchSize;
