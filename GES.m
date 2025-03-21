@@ -544,7 +544,7 @@ classdef GES < handle
                 fprintf( ...
                     [
                         'Points number: <strong>%i</strong>\n' ...
-                        'Refinement time: <strong>%.2f</strong>\n\n'
+                        'Refinement time: <strong>%.2f</strong> s\n\n'
                     ], obj.PointNum, toc(obj.StartTime));
             end
         end
