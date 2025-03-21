@@ -405,7 +405,7 @@ classdef GES < handle
                             'Classification time: <strong>%0.2f</strong> s\n\n'
                         ], toc(obj.StartTime));
 
-                    disp(array2table(obj.CandPoint, VariableNames=["z" "k"]));
+                    disp(sortrows(array2table(obj.CandPoint, VariableNames=["z" "k"]), 'k', 'descend'));
                 end
             end
         end
