@@ -43,7 +43,7 @@ classdef GES < handle
         %   scalar
 
         %% PointNumMin: minimum number of triangulation points
-        PointNumMin (1,1) {mustBeInteger, mustBeNonnegative} = 25
+        PointNumMin (1,1) {mustBeInteger, mustBeNonnegative} = 9
         %   scalar
 
         %% FlowMax: maximum of gradient flow
@@ -94,7 +94,7 @@ classdef GES < handle
             %
             %   (optional) PointNumMin: minimum number of triangulation points,
             %                           positive integer
-            %   default: empty (number of corner points + 21)
+            %   default: empty (number of corner points + 5)
             %
             %   (optional) FlowMax: maximum of gradient flow,
             %                       positive scalar
@@ -153,13 +153,10 @@ classdef GES < handle
             side_rel = side / obj.DomainNorm;
 
             % Create initial mesh
-            n_x = ceil(side_rel(1)) + 1;
-            n_y = ceil(side_rel(2)) + 1;
-
             [initial_point_x, initial_point_y] = ...
                 ndgrid( ...
-                        linspace(0, side_rel(1), n_x), ...
-                        linspace(0, side_rel(2), n_y) ...
+                        [0 side_rel(1)], ...
+                        [0 side_rel(2)] ...
                     );
 
             % Check whether additional initial points are inside the domain
@@ -189,7 +186,7 @@ classdef GES < handle
 
             % Set minimum number of triangulation points
             if isempty(opt.PointNumMin)
-                obj.PointNumMin = size(obj.PointStorage, 1) + 21;
+                obj.PointNumMin = 2 * (1 + floor(prod(side_rel))) + 5;
             else
                 obj.PointNumMin = opt.PointNumMin;
             end
