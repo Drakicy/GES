@@ -2,7 +2,7 @@
 
 ## Definition
 
-Global Equation Solver (GES) is a global complex zeros and poles finding algorithm analyzing logarithm of the function. For a complex function $f = f(z)$, algorithm approximates complex points $\tilde{z}_i$, such that $f(\tilde{z}_i) = 0$ or $[f(\tilde{z}_i)]^{-1}=0$. The function $f$ is assumed to be meromorphic in the inspected domain, however, output of the algorithm can be beneficial in other cases as well.
+Global Equation Solver (GES) is a global complex zeros and poles finding algorithm analyzing logarithm of the function. For a complex function $f = f(z)$, algorithm approximates complex points $z^*_i$, such that $f(z^*_i) = 0$ or $[f(z^*_i)]^{-1}=0$. The function $f$ is assumed to be meromorphic in the inspected domain, however, output of the algorithm can be beneficial in other cases as well.
 
 The theoretical basis of the algorithm and some applications are described in following articles:
 1. Viktor A. Frantsuzov, Anton V. Artemyev, "A global argument-based algorithm for finding complex zeros and poles to investigate plasma kinetic instabilities", Journal of Computational and Applied Mathematics, [link](http://dx.doi.org/10.1016/j.cam.2024.116217)
