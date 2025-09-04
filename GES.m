@@ -94,7 +94,7 @@ classdef GES < handle
             %
             %   (optional) PointNumMin: minimum number of triangulation points,
             %                           positive integer
-            %   default: empty (number of corner points + 5)
+            %   default: empty (2 * (1 + relation between domain sides) + 5)
             %
             %   (optional) FlowMax: maximum of gradient flow,
             %                       positive scalar
