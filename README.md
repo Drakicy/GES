@@ -53,7 +53,7 @@ The algorithm is affected by 4 optional parameters: approximation relative toler
 ```
 tol = ...; %positive scalar with value less than 1  (default 1 / 2^10)
 point_num_max = ...; %positive integer (default 0, no limit)
-point_num_min = ...; %positive integer (default empty, number of corner points plus 21)
+point_num_min = ...; %positive integer (default empty, 2 * (1 + relation between domain sides) + 5)
 flow_max = ...; %positive scalar (default Inf)
 ```
 
